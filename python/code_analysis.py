@@ -93,8 +93,7 @@ class LineProfiler:
             for k, v in all_locals.items():
                 if not k.startswith("__") and k not in ignored_variables:
                     relevant_locals[k] = v
-            if not past_locals:
-               past_locals=deepcopy(relevant_locals)
+
             if past_locals and relevant_locals != past_locals:
                diff = {}
                for k in relevant_locals:
@@ -102,13 +101,15 @@ class LineProfiler:
                         diff[k]=relevant_locals[k]
                relevant_locals.clear()
                relevant_locals = deepcopy(diff)
+            if past_locals and relevant_locals == past_locals:
+                return
+            if not past_locals:
+               past_locals=deepcopy(relevant_locals)
             lineno = frame.f_lineno - 1
 #            if event == 'return':
 #                lineno += 1
-            print("before iin:%s,%s"%(frame.f_code,self.code_map[frame.f_code].get(lineno, None)))
             if not self.code_map[frame.f_code].get(lineno, None):
                 self.code_map[frame.f_code][lineno] = deepcopy(relevant_locals)
-                print("iin:%s,%s"%(frame.f_code,self.code_map[frame.f_code]))
         return self.tracer
 
     def __enter__(self):
