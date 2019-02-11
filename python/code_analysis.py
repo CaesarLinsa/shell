@@ -3,6 +3,7 @@ import os
 import linecache
 import inspect
 from oslo_log import log
+from copy import deepcopy
 
 LOG=log.getLogger(__name__)
 
@@ -85,17 +86,29 @@ class LineProfiler:
 
     def tracer(self, frame, event, arg):
         """Callback for sys.settrace"""
-        relevant_locals={}
+        global relevant_locals,past_locals
         if event in ('line', 'return') and frame.f_code in self.code_map:
             all_locals = frame.f_locals.copy()
             LOG.info("all locals:%s" %all_locals)
             for k, v in all_locals.items():
                 if not k.startswith("__") and k not in ignored_variables:
                     relevant_locals[k] = v
-            lineno = frame.f_lineno
-            if event == 'return':
-                lineno += 1
-            self.code_map[frame.f_code][lineno] = relevant_locals
+            if not past_locals:
+               past_locals=deepcopy(relevant_locals)
+            if past_locals and relevant_locals != past_locals:
+               diff = {}
+               for k in relevant_locals:
+                   if k not in past_locals:
+                        diff[k]=relevant_locals[k]
+               relevant_locals.clear()
+               relevant_locals = deepcopy(diff)
+            lineno = frame.f_lineno - 1
+#            if event == 'return':
+#                lineno += 1
+            print("before iin:%s,%s"%(frame.f_code,self.code_map[frame.f_code].get(lineno, None)))
+            if not self.code_map[frame.f_code].get(lineno, None):
+                self.code_map[frame.f_code][lineno] = deepcopy(relevant_locals)
+                print("iin:%s,%s"%(frame.f_code,self.code_map[frame.f_code]))
         return self.tracer
 
     def __enter__(self):
