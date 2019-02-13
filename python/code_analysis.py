@@ -99,6 +99,9 @@ class LineProfiler:
                for k in relevant_locals:
                    if k not in past_locals:
                         diff[k]=relevant_locals[k]
+                   else:
+                       if relevant_locals[k] != past_locals[k]:
+                           diff[k]=relevant_locals[k]
                relevant_locals.clear()
                relevant_locals = deepcopy(diff)
             if past_locals and relevant_locals == past_locals:
