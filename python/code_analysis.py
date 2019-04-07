@@ -4,6 +4,7 @@ import linecache
 import inspect
 from oslo_log import log
 from copy import deepcopy
+import functools
 
 LOG=log.getLogger(__name__)
 
@@ -84,33 +85,34 @@ class LineProfiler:
             if self.enable_count == 0:
                 self.disable()
 
+    def ciro(self,maps):
+        ma = {}
+        for map in maps:
+            for m in map:
+                ma[m] = map[m]
+        return ma
+
+    def caesar(self, val, maps):
+        diff = {}
+        maps = self.ciro(maps)
+        for key in val:
+            if key not in maps or maps.get(key) != val.get(key):
+                diff[key]=val[key]
+        return diff
+
     def tracer(self, frame, event, arg):
         """Callback for sys.settrace"""
-        global relevant_locals,past_locals
+        relevant_locals = {}
         if event in ('line', 'return') and frame.f_code in self.code_map:
             all_locals = frame.f_locals.copy()
-            LOG.info("all locals:%s" %all_locals)
             for k, v in all_locals.items():
                 if not k.startswith("__") and k not in ignored_variables:
                     relevant_locals[k] = v
-
-            if past_locals and relevant_locals != past_locals:
-               diff = {}
-               for k in relevant_locals:
-                   if k not in past_locals:
-                        diff[k]=relevant_locals[k]
-                   else:
-                       if relevant_locals[k] != past_locals[k]:
-                           diff[k]=relevant_locals[k]
-               relevant_locals.clear()
-               relevant_locals = deepcopy(diff)
-            if past_locals and relevant_locals == past_locals:
-                return
-            if not past_locals:
-               past_locals=deepcopy(relevant_locals)
+            past_locals = self.code_map[frame.f_code].values()
+            relevant_locals = self.caesar(relevant_locals, past_locals)
             lineno = frame.f_lineno - 1
-#            if event == 'return':
-#                lineno += 1
+            if event == 'return':
+                lineno += 1
             if not self.code_map[frame.f_code].get(lineno, None):
                 self.code_map[frame.f_code][lineno] = deepcopy(relevant_locals)
         return self.tracer
@@ -140,9 +142,7 @@ def show_results(prof, stream=None, precision=3):
     if stream is None:
         stream = sys.stdout
     template = '{0:<6} {1:<69}{2:>}\n'
-    LOG.info("strat %s" %str(prof))
     for code in prof.code_map:
-        LOG.info("start code:%s" %str(prof.code_map))
         var_dic = prof.code_map[code]
         if not var_dic:
             LOG.info("var_dic is None")
@@ -150,18 +150,16 @@ def show_results(prof, stream=None, precision=3):
         filename = code.co_filename
         if filename.endswith((".pyc", ".pyo")):
             filename = filename[:-1]
-        LOG.info('Filename: %s'  % filename)
         if not os.path.exists(filename):
             LOG.info('ERROR: Could not find file %s' %filename)
             if filename.startswith("ipython-input") or filename.startswith("<ipython-input"):
-                print("NOTE: %mprun can only be used on functions defined in "
+                LOG.info("NOTE: %mprun can only be used on functions defined in "
                       "physical files, and not in the IPython environment.")
             continue
         all_lines = linecache.getlines(filename)
         sub_lines = inspect.getblock(all_lines[code.co_firstlineno - 1:])
         linenos = range(code.co_firstlineno, code.co_firstlineno +
                         len(sub_lines))
-        LOG.info("lineno:%s" %str(linenos))
         header = template.format('Line #', 'Line Contents', 'var')
         LOG.info(header + '\n')
         LOG.info("%s" %'=' * len(header))
@@ -172,9 +170,9 @@ def show_results(prof, stream=None, precision=3):
 
 def profile(func, stream=None):
     """
-    Decorator that will run the function and print a line-by-line profile
+    Decorator that will run the function and LOG.info a line-by-line profile
     """
-
+    @functools.wraps(func)
     def wrapper(*args, **kwargs):
         prof = LineProfiler()
         LOG.info("profle:%s" %str(prof))
