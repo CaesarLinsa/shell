@@ -13,9 +13,10 @@ class ConfigParse(object):
 
     # write dict to ini file
     def write_file(self, di):
+        dic = self._dic_to_ini_validate(di) 
         section_data = self.read_file()
-        section_remove = [ d for d in section_data.keys() if d not in di.keys()]
-        section_add = [ s for s in di.keys() if s not in section_data.keys() ]
+        section_remove = [ d for d in section_data.keys() if d not in dic.keys()]
+        section_add = [ s for s in dic.keys() if s not in section_data.keys() ]
         for k in section_remove:
             self.conf.remove_section(k)
         # set option ,value to ini file according to the dict
@@ -29,10 +30,27 @@ class ConfigParse(object):
         section_have = [ k for k in section_data.keys() if k not in section_remove]
         for k in section_have:
             for option,value in section_data.get(k).items():
-                if not di.get(k).get(option, None):
+                if not dic.get(k).get(option, None):
                     self.conf.remove_option(k, option)
 
         with open(self.file,'w') as f:
             self.conf.write(f)
 
+    def _dic_to_ini_validate(self, dic):
+        complex_types = [dict, list, tuple]
+        if not isinstance(dic, dict):
+            raise Exception("%s is not valid dict" %dic)
+        for section, value in dic.items():
+            if type(section) in complex_types:
+                raise Exception("section %s must be str" %section)
+            if not isinstance(value, dict):
+                raise Exception("%s is not valid dict" %dic)
+            for k,v in value.items():
+                if type(k) in complex_types:
+                    raise Exception("option %s must be str" %k)
+                if type(v) in complex_types:
+                    raise Exception("value %s must be str" %v)
+                value[str(k)]=str(value.pop(k))
+            dic[str(section)] = dic.pop(section)
+        return dic
 
