@@ -1,22 +1,29 @@
 #!/bin/sh
 #
-# 每隔1min统计，文档中关键字次数的变化
+# analysis the number of keyword occurrences in the file
+# every 60 seconds
 #
-file="/var/log/mongodb/mongodb.log"
+#
+keyword=$1
+file=$2
 count=0
 while true
 do
  if [ $count -lt 1 ];then
- # 首次统计文档中关键字次数
- num=`grep -c "ceilometer" $file`
+ # At first,analysis the number 
+ # of keyword occurrences in the file
+ num=`grep -c "$keyword" $file`
  else
-    # 每隔1min统计关键字次数，并将两者最差输出
-    this_num=`grep -c "ceilometer" $file`
+    # After 60 seconds,analysis the number
+    # of keyword occurrences
+    this_num=`grep -c "$keyword" $file`
     number=`expr $this_num - $num`
-    #以增加后的次数作为基数
+    # The increased number of times as the next
+    # numbers
     num=$this_num
-    echo $number
+    time=$(date  +"%Y-%m-%dT%H:%M:%S")
+    printf "%s \t %s\n" $time $number
  fi
  let count++
- sleep 60
+ sleep 5
 done
