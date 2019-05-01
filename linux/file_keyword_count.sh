@@ -25,5 +25,5 @@ do
     printf "%s \t %s\n" $time $number
  fi
  let count++
- sleep 5
+ sleep 60
 done
