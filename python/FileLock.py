@@ -5,9 +5,7 @@ class FileLock(object):
     """Advisory file based locking.  This should be reasonably cross platform
        and also work over distributed file systems."""
     def __init__(self, fno, exclusive=False):
-        # In inplace mode, the process must be careful to not close this fp
-        # until finished, nor open and close another fp associated with the
-        # file.
+        # fno is FileObject
         self.fp = fno
         self.locked = False
 
