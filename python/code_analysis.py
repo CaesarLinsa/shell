@@ -5,31 +5,15 @@ import inspect
 from oslo_log import log
 from copy import deepcopy
 import functools
-
-LOG=log.getLogger(__name__)
-
-relevant_locals={}
-past_locals = {}
-
-ignored_variables = set([
-      'file_name',
-      'trace',
-      'sys',
-      'getattr',
-      'name',
-      'self',
-      'object',
-      'consumed',
-      'data',
-      'ignored_variables'])
-
+import ast
 
 class LineProfiler:
-    """ A profiler that records the amount of memory for each line """
+    """ A profiler that records the args of function for each line """
 
     def __init__(self, **kw):
         self.functions = list()
         self.code_map = {}
+        self.code = None
         self.enable_count = 0
 
     def __call__(self, func):
@@ -52,8 +36,8 @@ class LineProfiler:
             warnings.warn("Could not extract a code object for the object %r"
                           % (func,))
             return
-        if code not in self.code_map:
-            self.code_map[code] = {}
+        if code:
+            self.code = code
             self.functions.append(func)
 
     def wrap_function(self, func):
@@ -85,36 +69,39 @@ class LineProfiler:
             if self.enable_count == 0:
                 self.disable()
 
-    def ciro(self,maps):
-        ma = {}
-        for map in maps:
-            for m in map:
-                ma[m] = map[m]
-        return ma
+    def get_relevant_names(self, source,tree):
+        return [node for node in ast.walk(tree) if isinstance(node, ast.Name)]
 
-    def caesar(self, val, maps):
-        diff = {}
-        maps = self.ciro(maps)
-        for key in val:
-            if key not in maps or maps.get(key) != val.get(key):
-                diff[key]=val[key]
-        return diff
+
+    def get_relevant_values(self, source, frame, tree):
+        names = self.get_relevant_names(source, tree)
+        values = []
+        for name in names:
+            text = name.id
+            col = name.col_offset
+            if text in frame.f_locals:
+                val = frame.f_locals.get(text, None)
+                values.append((text, col, val))
+            elif text in frame.f_globals:
+                val = frame.f_globals.get(text, None)
+                values.append((text, col, val))
+        values.sort(key=lambda e: e[1])
+        return values
 
     def tracer(self, frame, event, arg):
         """Callback for sys.settrace"""
         relevant_locals = {}
-        if event in ('line', 'return') and frame.f_code in self.code_map:
-            all_locals = frame.f_locals.copy()
-            for k, v in all_locals.items():
-                if not k.startswith("__") and k not in ignored_variables:
-                    relevant_locals[k] = v
-            past_locals = self.code_map[frame.f_code].values()
-            relevant_locals = self.caesar(relevant_locals, past_locals)
-            lineno = frame.f_lineno - 1
+        if  event in ('line', 'return', 'eventcall') and self.code == frame.f_code:
+            lineno = frame.f_lineno
+            filename = frame.f_code.co_filename
+            source = linecache.getline(filename,lineno)
+            source = source.strip()
+            tree = ast.parse(source, mode='exec')
+            values = self.get_relevant_values(source,frame,tree)
+            lines = self.format_frame(values)
             if event == 'return':
                 lineno += 1
-            if not self.code_map[frame.f_code].get(lineno, None):
-                self.code_map[frame.f_code][lineno] = deepcopy(relevant_locals)
+            self.code_map[lineno] = lines
         return self.tracer
 
     def __enter__(self):
@@ -130,52 +117,45 @@ class LineProfiler:
         self.last_time = {}
         sys.settrace(None)
 
-def item_kvpairs(kvpairs):
-    li = []
-    if kvpairs is None:
-        return ""
-    for k, v in kvpairs.items():
-        li.append("%s=%s" % (k, v))
-    return " ".join(li)
+    def format_frame(self, relevant_values):
+        lines = []
+        for i in reversed(range(len(relevant_values))):
+            para, col, val = relevant_values[i]
+            lines.append("%s=%s" %(para, val))
+        return lines
+
 
 def show_results(prof, stream=None, precision=3):
     if stream is None:
         stream = sys.stdout
-    template = '{0:<6} {1:<69}{2:>}\n'
-    for code in prof.code_map:
-        var_dic = prof.code_map[code]
-        if not var_dic:
-            LOG.info("var_dic is None")
-            continue
-        filename = code.co_filename
-        if filename.endswith((".pyc", ".pyo")):
-            filename = filename[:-1]
-        if not os.path.exists(filename):
-            LOG.info('ERROR: Could not find file %s' %filename)
-            if filename.startswith("ipython-input") or filename.startswith("<ipython-input"):
-                LOG.info("NOTE: %mprun can only be used on functions defined in "
-                      "physical files, and not in the IPython environment.")
-            continue
-        all_lines = linecache.getlines(filename)
-        sub_lines = inspect.getblock(all_lines[code.co_firstlineno - 1:])
-        linenos = range(code.co_firstlineno, code.co_firstlineno +
-                        len(sub_lines))
-        header = template.format('Line #', 'Line Contents', 'var')
-        LOG.info(header + '\n')
-        LOG.info("%s" %'=' * len(header))
-        for i, l in enumerate(linenos):
-            LOG.info("%s" %template.format(l, sub_lines[i][:-1],item_kvpairs(var_dic.get(l,None))))
-        LOG.info('\n\n')
+    code = prof.code
+    filename = code.co_filename
+    if filename.endswith((".pyc", ".pyo")):
+        filename = filename[:-1]
+    if not os.path.exists(filename):
+        sys.stdout.write('ERROR: Could not find file %s' %filename)
+        if filename.startswith("ipython-input") or filename.startswith("<ipython-input"):
+            sys.stdout.write("NOTE: %mprun can only be used on functions defined in "
+                  "physical files, and not in the IPython environment.")
+    first_line = code.co_firstlineno
+    while True:
+        line = linecache.getline(filename,first_line)
+        if  line.startswith("\n"):
+            break
+        sys.stdout.write(line)
+        if first_line in prof.code_map and prof.code_map.get(first_line+1):
+            sys.stdout.write(">>>" +" ".join(prof.code_map.get(first_line+1))+"\n")
+        first_line += 1
+    sys.stdout.write('\n\n')
 
 
 def profile(func, stream=None):
     """
-    Decorator that will run the function and LOG.info a line-by-line profile
+    Decorator that will run the function and print a line-by-line profile
     """
     @functools.wraps(func)
     def wrapper(*args, **kwargs):
         prof = LineProfiler()
-        LOG.info("profle:%s" %str(prof))
         val = prof(func)(*args, **kwargs)
         show_results(prof, stream=stream)
         return val
