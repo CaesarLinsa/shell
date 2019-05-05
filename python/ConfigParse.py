@@ -1,4 +1,5 @@
 from ConfigParser import ConfigParser
+from code_analysis import profile
 
 class ConfigParse(object):
 
@@ -53,4 +54,49 @@ class ConfigParse(object):
                 value[str(k)]=str(value.pop(k))
             dic[str(section)] = dic.pop(section)
         return dic
+    
+    # add or update option key and value
+    def add_option_key_value(self, option, key, value):
+        dic = self.read_file()
+        options = dic.keys()
+        if option in options:
+            dic[option][key] = value
+        else:    
+            dic[option] = {key:value}
+        self.write_file(dic)
+
+    # del the key that in the option
+    def del_option_key(self, option, key):
+        dic = self.read_file()
+        options = dic.keys()
+        if option not in options:
+            return
+        else:
+            if key not in dic[option].keys():
+                return
+            else:
+                del dic[option][key]
+        self.write_file(dic)
+    
+    # del option
+    def del_option(self, option):
+        dic = self.read_file()
+        if option not in dic.keys():
+            return
+        else:
+            del dic[option]
+        self.write_file(dic)
+
+    # get options
+    def get_options(self):
+        dic = self.read_file()
+        return dic.keys()
+    
+    # get some option keys of ini file
+    def get_option_keys(self, option):
+        dic = self.read_file()
+        if option not in dic.keys():
+            return []
+        else:
+           return dic[option].keys()
 
