@@ -1,5 +1,5 @@
 from ConfigParser import ConfigParser
-from code_analysis import profile
+
 
 class ConfigParse(object):
 
