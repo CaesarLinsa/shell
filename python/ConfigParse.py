@@ -1,4 +1,4 @@
-from ConfigParser import ConfigParser
+from ConfigParser import RawConfigParser as ConfigParser
 
 
 class ConfigParse(object):
@@ -99,4 +99,13 @@ class ConfigParse(object):
             return []
         else:
            return dic[option].keys()
-
+   
+    def get_option_key_value(self, option, key):
+        dic = self.read_file()
+        if option not in dic.keys():
+            return 
+        else:
+            if key not in dic[option].keys():
+                return
+            else:
+                return dic[option][key]
