@@ -7,9 +7,10 @@ from copy import deepcopy
 import functools
 import ast
 
+
 class LineProfiler:
     """ A profiler that records the args of function for each line """
-
+    
     def __init__(self, **kw):
         self.functions = list()
         self.code_map = {}
@@ -87,7 +88,7 @@ class LineProfiler:
                 values.append((text, col, val))
         values.sort(key=lambda e: e[1])
         return values
-
+        
     def tracer(self, frame, event, arg):
         """Callback for sys.settrace"""
         relevant_locals = {}
@@ -96,6 +97,8 @@ class LineProfiler:
             filename = frame.f_code.co_filename
             source = linecache.getline(filename,lineno)
             source = source.strip()
+            if source.endswith(":"):
+                return
             tree = ast.parse(source, mode='exec')
             values = self.get_relevant_values(source,frame,tree)
             lines = self.format_frame(values)
@@ -143,8 +146,8 @@ def show_results(prof, stream=None, precision=3):
         if  line.startswith("\n"):
             break
         sys.stdout.write(line)
-        if first_line in prof.code_map and prof.code_map.get(first_line+1):
-            sys.stdout.write(">>>" +" ".join(prof.code_map.get(first_line+1))+"\n")
+        if first_line in prof.code_map and prof.code_map.get(first_line):
+            sys.stdout.write(">>>" +" ".join(prof.code_map.get(first_line))+"\n")
         first_line += 1
     sys.stdout.write('\n\n')
 
