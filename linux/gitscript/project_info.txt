@@ -1,0 +1,3 @@
+shell               master     https://github.com/CaesarLinsa/shell.git
+better-exceptions   master     https://github.com/CaesarLinsa/better-exceptions.git
+caesarlinsa         master1.0  https://github.com/CaesarLinsa/caesarlinsa.git
