@@ -39,3 +39,6 @@ file_keyword_count.sh $keyworld  $filepath
 2019-05-04T19:34:57 	 12
 2019-05-04T19:35:57 	 41
 ```
+## git_download.sh
+配置git后(ssh rsa),在project_info.txt中添加工程信息，工程名(projectname)，分支(branch)和url后，使用此脚本，自动化完成工程的下载和分支的切换，尤其对众多工程下载和进行比对时。将此脚本和project_info.txt放在目录下，使用bash git_download.sh，根据分支创建目录并将在次分支的工程下载该目录下。
+

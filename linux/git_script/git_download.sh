@@ -1,3 +1,4 @@
+#!/bin/sh
 # get project_info.txt project infomation about
 # project, branch ,url to download project and
 # checkout to branch
