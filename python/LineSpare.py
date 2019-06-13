@@ -32,6 +32,6 @@ def line_spare(lines):
 
 
 def main(lines):
-lines_use = line_use(lines)
-lines_free = line_spare(lines_use)
+    lines_use = line_use(lines)
+    lines_free = line_spare(lines_use)
 
