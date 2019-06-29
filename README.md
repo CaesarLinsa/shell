@@ -56,7 +56,6 @@ file_keyword_count.sh $keyworld  $filepath
 配置git后(ssh rsa),在project_info.txt中添加工程信息，工程名(projectname)，分支(branch)和url后，使用此脚本，自动化完成工程的下载和分支的切换，尤其对众多工程下载和进行比对时。将此脚本和project_info.txt放在目录下，使用bash git_download.sh $path，在$path下，根据分支创建目录并将在此分支的工程下载，当使用bash git_download.sh，下载在脚本所在位置。
 
 ## diff_changes_to_excel.sh
-
 对不同branch 的代码使用linux 自带diff -u dir1/  dir2/比较，如下log日志：
 
 ```linux
@@ -67,7 +66,5 @@ file_keyword_count.sh $keyworld  $filepath
 +
  signal_pipe_r, signal_pipe_w = os.pipe()
 ```
-
 通过脚本 bash diff_changes_to_excel.sh log文件，将差异文件和差异点，输出在excel的第一列和第二列，如下所示：
-
-![image]（https://github.com/CaesarLinsa/shell/blob/master/diff_change_to_excel.png）
+![image](https://github.com/CaesarLinsa/shell/blob/master/diff_change_to_excel.png)
