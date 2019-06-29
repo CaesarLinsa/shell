@@ -70,6 +70,4 @@ file_keyword_count.sh $keyworld  $filepath
 
 通过脚本 bash diff_changes_to_excel.sh log文件，将差异文件和差异点，输出在excel的第一列和第二列，如下所示：
 
-```
 ![image]（https://github.com/CaesarLinsa/shell/blob/master/diff_change_to_excel.png）
-```
