@@ -20,5 +20,5 @@ function log_info {
 # Log the given message at ERROR level. All logs are written to stderr with a timestamp.
 function log_error {
   local -r message="$1"
-  log "ERROR" "\033[31m$message\033[0m"
+  log "ERROR" "$message"
 }
