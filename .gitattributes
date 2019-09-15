@@ -1,0 +1,2 @@
+*.sh linguist-language=shell
+*.py linguist-language=python
