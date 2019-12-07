@@ -17,6 +17,10 @@
 {'ciro': {'age': '18', 'name': 'ciro'}}
 >>>
 ```
+## exec_remote_shell
+
+登录远程服务器执行命令，尤其对多台服务器进行管理。在host_ips中加入服务器ip，执行./exec_remote_shell.sh user host user_password root_password "exec_command"。
+
 
 ## code_analysis.py
 
@@ -51,7 +55,7 @@ file_keyword_count.sh $keyworld  $filepath
 2019-05-04T19:35:57 	 41
 ```
 
-## git_download.sh
+## git_script
 
 配置git后(ssh rsa),在project_info.txt中添加工程信息，工程名(projectname)，分支(branch)和url后，使用此脚本，自动化完成工程的下载和分支的切换，尤其对众多工程下载和进行比对时。将此脚本和project_info.txt放在目录下，使用bash git_download.sh $path，在$path下，根据分支创建目录并将在此分支的工程下载，当使用bash git_download.sh，下载在脚本所在位置。
 
@@ -67,4 +71,5 @@ file_keyword_count.sh $keyworld  $filepath
  signal_pipe_r, signal_pipe_w = os.pipe()
 ```
 通过脚本 bash diff_changes_to_excel.sh log文件，将差异文件和差异点，输出在excel的第一列和第二列，如下所示：
-![image](https://github.com/CaesarLinsa/shell/blob/master/diff_change_to_excel.png)
+![image](https://github.com/CaesarLinsa/shell/blob/master/images/diff_change_to_excel.png)
+
