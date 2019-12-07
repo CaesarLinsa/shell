@@ -1,0 +1,41 @@
+#!/usr/bin/expect
+set timeout 5
+
+if { [llength $argv] < 5} {
+    puts "Usage:"
+        puts "$argv0 user host user_passwd root_passwd exec_command"
+        exit 1
+}
+
+set user [lindex $argv 0 ]
+set host [lindex $argv 1]
+set user_passwd [lindex $argv 2 ]
+set root_passwd [lindex $argv 3]
+set exec_command [lindex $argv 4]
+
+spawn ssh $user@$host 
+# login from $user to root
+expect {
+       "*es/no)?*" {
+           send "yes\n"
+           exp_continue
+          }
+       "*password*" {
+           send "$user_passwd\n"
+           exp_continue
+           }
+        "*ast login*" {
+           send "su\n"
+           exp_continue
+          }
+        "*assword:" {
+           send "$root_passwd\n"
+         }
+      }
+# use root to execute command
+expect "*root@*"
+send "$exec_command\r" 
+send "exit\n"
+send "exit\n"
+expect eof 
+

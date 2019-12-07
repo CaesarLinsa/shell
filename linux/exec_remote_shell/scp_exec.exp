@@ -1,0 +1,28 @@
+#!/usr/bin/expect
+set timeout 5
+
+if { [llength $argv] < 5} {
+    puts "Usage:"
+        puts "$argv0 user host local_file remote_dir user_passwd"
+        exit 1
+}
+
+set user [lindex $argv 0 ]
+set host [lindex $argv 1]
+set local_file [lindex $argv 2 ]
+set remote_dir [lindex $argv 3]
+set user_passwd [lindex $argv 4]
+
+spawn scp $local_file  $user@$host:$remote_dir 
+# login from $user to root
+expect {
+       "*es/no)?*" {
+           send "yes\n"
+           exp_continue
+          }
+       "*password*" {
+           send "$user_passwd\n"
+           }
+      }
+
+expect eof
