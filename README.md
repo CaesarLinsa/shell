@@ -21,6 +21,8 @@
 
 登录远程服务器执行命令，尤其对多台服务器进行管理。在host_ips中加入服务器ip，执行./exec_remote_shell.sh user host user_password root_password "exec_command"。
 
+## file_compare.py
+对相似两个目录文件进行对比，基于第一个目录dir1，计算比第二个目录dir2多出的文件和不同文件的不同内容。执行python file_compare.py dir1 dir2。
 
 ## code_analysis.py
 
@@ -58,6 +60,22 @@ file_keyword_count.sh $keyworld  $filepath
 ## git_script
 
 配置git后(ssh rsa),在project_info.txt中添加工程信息，工程名(projectname)，分支(branch)和url后，使用此脚本，自动化完成工程的下载和分支的切换，尤其对众多工程下载和进行比对时。将此脚本和project_info.txt放在目录下，使用bash git_download.sh $path，在$path下，根据分支创建目录并将在此分支的工程下载，当使用bash git_download.sh，下载在脚本所在位置。
+
+## Ssh.py
+依赖paramiko库，实现登录服务器，执行linux命令，获取返回结果。示例如下:
+```python
+host_info = {
+              "host":"196.168.1.234",
+              "username":"caesar",
+              "password":"123"
+}
+ssh = Ssh(host_info)
+ssh.connect()
+ret, out, err = ssh.execute_cmd("cd /home/caesar")
+print ret
+ret, out, err = ssh.execute_cmd("ls -al")
+print out
+```
 
 ## diff_changes_to_excel.sh
 对不同branch 的代码使用linux 自带diff -u dir1/  dir2/比较，如下log日志：
