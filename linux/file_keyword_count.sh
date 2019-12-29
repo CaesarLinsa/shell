@@ -1,9 +1,6 @@
 #!/bin/sh
-#
 # analysis the number of keyword occurrences in the file
 # every 60 seconds
-#
-#
 keyword=$1
 file=$2
 count=0
