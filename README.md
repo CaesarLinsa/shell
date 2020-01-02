@@ -19,6 +19,7 @@
 ```
 ## query_json.py
 json文件搜索，每行一个json对象。根据json对象中属性进行搜索，将符合条件的json对象打印出来。
+```
 cat json.db
 {"name":"caesar","age":18}
 {"name":"caesar","age":19}
@@ -31,7 +32,7 @@ python query_json.py  json.db "{\"gt\":{\"age\":19}}"
 
 python query_json.py  json.db "{\"ge\":{\"age\":19}}"
 {"name":"caesar","age":19}
-
+```
 ## exec_remote_shell
 
 登录远程服务器执行命令，尤其对多台服务器进行管理。在host_ips中加入服务器ip，执行./exec_remote_shell.sh user host user_password root_password "exec_command"。
