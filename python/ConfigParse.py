@@ -118,13 +118,14 @@ class ConfigParse(object):
 
 
 def print_help():
-    print("Usage: python ConfigParse.py \n"
-          "              ini-file \n"
-          "              function-name \n"
-          "              function-args")
-    print("       ini-file:ini file path such as caesar.ini")
-    print("       function-name: the function name in ConfigParse")
-    print("       function-args: the function args of function-name")
+    func_list = [func for func in dir(ConfigParse) if not func.startswith("_")]
+    print("Usage:\tpython\tConfigParse.py\t\n"
+          "      \t      \tini-file \n"
+          "      \t      \tfunction-name \n"
+          "      \t      \tfunction-args")
+    print("ini-file      \tinifile path such as caesar.ini")
+    print("function-name \tthe function name in ConfigParse:%s" % ' '.join(func_list)) 
+    print("function-args \tthe function args of function-name")
 
 
 if __name__ == '__main__':
