@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 source log.sh
 
 check_domain_normal(){
@@ -22,7 +23,7 @@ check_file_modify_time(){
  if [ $(($ctime - $file_time)) -ge 3600 ]
  then
    log_info "test.sh is modify more than 3600 seconds"
- fi 
+ fi
 }
 
 check_file_exist_key_words(){

@@ -16,12 +16,12 @@ function array_split {
 # Joins the elements of the given array into a string with the given separator between each element.
 # Examples:
 # abc=("A" "B" "C")
-# array_join "," ${abc[*]}
-function array_join {
+# array_to_string "," ${abc[*]}
+function array_to_string {
   local -r separator="$1"
   shift
   local -ar values=("$@")
-  local out=""
+  local out
   for (( i=0; i<"${#values[@]}"; i++ )); do
     if [[ "$i" -gt 0 ]]; then
       out="${out}${separator}"

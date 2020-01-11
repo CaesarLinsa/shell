@@ -1,4 +1,7 @@
-from ConfigParser import RawConfigParser as ConfigParser
+try:
+    from ConfigParser import RawConfigParser as ConfigParser
+except Exception as e:
+    from configparser import RawConfigParser as Configparser
 import sys
 import json
 

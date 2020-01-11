@@ -4,34 +4,33 @@
 # checkout to branch
 
 get_path(){
- if [ -z "$1" ]
+ if [ -z "$clone_path" ]
    then
       path=$(pwd)
    else
-      path="$1"
+      path=$clone_path
  fi
 }
 
-# $1 is projectname
-# $2 is branch,$3 is url
 download_project(){
    cd $path
    if [ ! -d $branch ]
     then
-       mkdir $2
+       mkdir $branch
    fi
-   cd $2
-   git clone $3
-   cd $1
+   cd $branch
+   git clone $url
+   cd $project
    cur_branch=$(git branch -a |grep ^* |cut -d ' ' -f 2)
-   if [ $cur_branch != $2 ]
+   if [ $cur_branch != $branch ]
       then
-         target=$(git branch -a|grep $2)
-         git checkout -b  $2 $target
+         target=$(git branch -a|grep $branch)
+         git checkout -b  $branch $target
    fi
 }
 
-get_path $1
+clone_path="$1"
+get_path $clone_path
 while read line
 do
   project=$(echo $line|awk '{print$1}')

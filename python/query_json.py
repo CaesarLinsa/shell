@@ -66,6 +66,7 @@ class Filter(object):
         elements = [self.build_evaluator(node) for node in nodes]
         return lambda value: op((e(value) for e in elements))
 
+
 class Json_Parse(object):
     def __init__(self, filename):
         self.f = open(filename, "r+")
@@ -99,6 +100,6 @@ if __name__ == '__main__':
         line, data = jp.read_line()
         if line:
             if f(data):
-                print line,
+                print(line)
         else:
             break
