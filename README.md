@@ -4,6 +4,7 @@
 
 ## caesar_log.py
 对原生logging模块封装，可以方便地使用在项目中
+
 显示在控制台
 ``` python
 caesar_log.setup(level=logging.DEBUG,
