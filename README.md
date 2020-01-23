@@ -2,6 +2,43 @@
 
 一个在工作和学习中遇到的一些问题并进行编写的shell脚本的工程。工欲善其事必先利其器，脚本还在增长的过程中，凡是对工作可以优化的shell都会存放在此工程下，避免出现过河拆桥，用罢则扔，需要又写的尴尬处境。
 
+## caesar_log.py
+对原生logging模块封装，可以方便地使用在项目中
+显示在控制台
+``` python
+caesar_log.setup(level=logging.DEBUG,
+                 outs=[caesar_log.StreamOut(level=logging.DEBUG)],
+                 program_name=None,
+                 capture_warnings=True)
+LOG = logging.getLogger(__name__)
+LOG.info("caesar come here")
+```
+记录到日志
+``` python
+import logging
+import caesar_log
+caesar_log.setup(level=logging.DEBUG,
+                 outs=[caesar_log.File(filename="caesar.log",
+                                       level=logging.DEBUG)],
+                 program_name=None,
+                 capture_warnings=True)
+
+LOG = logging.getLogger(__name__)
+LOG.info("caesar come here")
+```
+或者以固定大小归档日志
+``` python
+caesar_log.setup(level=logging.DEBUG,
+                 outs=[caesar_log.RotatingFile(filename="caesar.log",
+                                               level=logging.DEBUG,
+                                               max_size_bytes=1000,
+                                               backup_count=3)],
+                 program_name=None,
+                 capture_warnings=True)
+
+LOG = logging.getLogger(__name__)
+LOG.info("caesar come here")
+```
 ## ConfigParse.py
 
 一个ini文件读写的脚本，通过该脚本可以读取ini文件内容转为dict格式，或者将dict内容写入ini文件。写入的dict会进行格式校验，形如{str:{str:str|int|float}}格式。
