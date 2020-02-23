@@ -8,7 +8,7 @@
 显示在控制台
 ``` python
 log_util.setup(level=logging.DEBUG,
-                 outs=[caesar_log.StreamOut(level=logging.DEBUG)],
+                 outs=[log_util.StreamOut(level=logging.DEBUG)],
                  program_name=None,
                  capture_warnings=True)
 LOG = logging.getLogger(__name__)
@@ -19,7 +19,7 @@ LOG.info("caesar come here")
 import logging
 import log_util
 log_util.setup(level=logging.DEBUG,
-                 outs=[caesar_log.File(filename="caesar.log",
+                 outs=[log_util.File(filename="caesar.log",
                                        level=logging.DEBUG)],
                  program_name=None,
                  capture_warnings=True)
@@ -30,10 +30,10 @@ LOG.info("caesar come here")
 或者以固定大小归档日志
 ``` python
 log_util.setup(level=logging.DEBUG,
-                 outs=[caesar_log.RotatingFile(filename="caesar.log",
-                                               level=logging.DEBUG,
-                                               max_size_bytes=1000,
-                                               backup_count=3)],
+               outs=[log_util.RotatingFile(filename="caesar.log",
+                                            level=logging.DEBUG,
+                                            max_size_bytes=1000,
+                                            backup_count=3)],
                  program_name=None,
                  capture_warnings=True)
 
@@ -57,7 +57,7 @@ LOG.info("caesar come here")
 ```
 ## query_json.py
 json文件搜索，每行一个json对象。根据json对象中属性进行搜索，将符合条件的json对象打印出来。
-```
+```python
 cat json.db
 {"name":"caesar","age":18}
 {"name":"caesar","age":19}
@@ -73,7 +73,7 @@ python query_json.py  json.db "{\"ge\":{\"age\":19}}"
 ```
 ## evar.py
 对方法参数及其返回值进行类型判断，如果不满足类型，则报错
-```
+```python
 from evar import expose
 
 @expose(int, int, int, return_type=int)
