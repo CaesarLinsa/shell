@@ -2,12 +2,12 @@
 
 一个在工作和学习中遇到的一些问题并进行编写的shell脚本的工程。工欲善其事必先利其器，脚本还在增长的过程中，凡是对工作可以优化的shell都会存放在此工程下，避免出现过河拆桥，用罢则扔，需要又写的尴尬处境。
 
-## caesar_log.py
+## log_util.py
 对原生logging模块封装，可以方便地使用在项目中
 
 显示在控制台
 ``` python
-caesar_log.setup(level=logging.DEBUG,
+log_util.setup(level=logging.DEBUG,
                  outs=[caesar_log.StreamOut(level=logging.DEBUG)],
                  program_name=None,
                  capture_warnings=True)
@@ -17,8 +17,8 @@ LOG.info("caesar come here")
 记录到日志
 ``` python
 import logging
-import caesar_log
-caesar_log.setup(level=logging.DEBUG,
+import log_util
+log_util.setup(level=logging.DEBUG,
                  outs=[caesar_log.File(filename="caesar.log",
                                        level=logging.DEBUG)],
                  program_name=None,
@@ -29,7 +29,7 @@ LOG.info("caesar come here")
 ```
 或者以固定大小归档日志
 ``` python
-caesar_log.setup(level=logging.DEBUG,
+log_util.setup(level=logging.DEBUG,
                  outs=[caesar_log.RotatingFile(filename="caesar.log",
                                                level=logging.DEBUG,
                                                max_size_bytes=1000,
@@ -71,6 +71,18 @@ python query_json.py  json.db "{\"gt\":{\"age\":19}}"
 python query_json.py  json.db "{\"ge\":{\"age\":19}}"
 {"name":"caesar","age":19}
 ```
+## evar.py
+对方法参数及其返回值进行类型判断，如果不满足类型，则报错
+```
+from evar import expose
+
+@expose(int, int, int, return_type=int)
+def spam(x, y, z=42):
+    return x * y * z
+
+print(spam(1, 2))
+```
+
 ## exec_remote_shell
 
 登录远程服务器执行命令，尤其对多台服务器进行管理。在host_ips中加入服务器ip，执行./exec_remote_shell.sh user host user_password root_password "exec_command"。
