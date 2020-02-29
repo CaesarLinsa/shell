@@ -55,6 +55,30 @@ LOG.info("caesar come here")
 {'ciro': {'age': '18', 'name': 'ciro'}}
 >>>
 ```
+## timeout.py
+启动一个进程，执行某代码段，若超时(时间可以设置，默认10秒)，则退出脚本
+```python
+from timeout import TimeOut
+
+def test():
+    import time
+    time.sleep(12)
+
+with TimeOut():
+    print("start")
+    test()
+    print("end")
+```
+执行后，结果见下:
+start
+Traceback (most recent call last):
+  File "test.py", line 9, in <module>
+    test()
+  File "test.py", line 5, in test
+    time.sleep(12)
+  File "/home/caesar/shell/python/timeout.py", line 14, in handle_alarm_signal
+    raise TimeOutException("timeout")
+
 ## query_json.py
 json文件搜索，每行一个json对象。根据json对象中属性进行搜索，将符合条件的json对象打印出来。
 ```python
