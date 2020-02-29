@@ -5,7 +5,7 @@ from functools import wraps
 
 def expose(*type_args, **type_kwargs):
     def decorate(func):
-        # 获取装饰参数类型
+        # 获取所装饰的方法的对象sig
         sig = signature(func)
         if "return_type" in type_kwargs:
             return_type = type_kwargs.pop("return_type")

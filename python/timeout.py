@@ -14,8 +14,8 @@ def handle_alarm_signal(signum, stack):
     raise TimeOutException("timeout")
 
 
-class timeout(object):
-    def __init__(self, time):
+class TimeOut(object):
+    def __init__(self, time=10):
         self.out_time = time
 
     def __enter__(self):
@@ -29,3 +29,4 @@ class timeout(object):
                 LOG.info("caught an Exception:%s" % exc_type)
             else:
                 LOG.info("caught an TimeOut Exception")
+
